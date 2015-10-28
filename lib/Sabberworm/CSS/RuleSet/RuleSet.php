@@ -17,9 +17,18 @@ abstract class RuleSet implements Renderable {
 		$this->aRules = array();
 	}
 
-	public function addRule(Rule $oRule) {
+	public function addRule(Rule $oRule, Rule $oBefore = null) {
 		$sRule = $oRule->getRule();
 		if(!isset($this->aRules[$sRule])) {
+			if(isset($oBefore, $this->aRules[$oBefore->getRule()])) {
+				$sBefore = $oBefore->getRule();
+				$offset = array_search($sBefore, array_keys($this->aRules));
+				$this->aRules = array_merge(
+					array_slice($this->aRules, 0, $offset),
+					array($sRule => array()),
+					array_slice($this->aRules, $offset, null)
+				);
+			}
 			$this->aRules[$sRule] = array();
 		}
 		$this->aRules[$sRule][] = $oRule;
